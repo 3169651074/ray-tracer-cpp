@@ -1,63 +1,65 @@
+[简体中文](./README_CN.md)
+
 # RendererTest
-一个简单的CPU端光线追踪器实现  
-查看`files/Ray-Tracing.pdf`以获取技术细节
+A simple CPU-side ray tracer implementation  
+Check `files/Ray-Tracing.pdf` for technical details
 
 ## Build
-此仓库中包含的源代码可直接在Windows和Linux上编译  
-如果在Windows上编译，请确保依赖库（SDL2）所需文件已经被正确放置：bin目录中包含.dll动态库文件，lib目录中包含静态库文件。  
-如果在Linux上编译，请先通过系统包管理器安装SDL2  
---> 推荐使用CLion IDE一键编译
+The source code included in this repository can be compiled directly on Windows and Linux.  
+If compiling on Windows, ensure that the required dependency library (SDL2) files are correctly placed: the `bin` directory contains `.dll` dynamic library files, and the `lib` directory contains static library files.  
+If compiling on Linux, please install SDL2 via the system package manager first.  
+Recommended to use CLion IDE for one-click compilation.
 
 ### Windows
-克隆仓库后直接使用CMake编译即可
+After cloning the repository, simply use CMake to compile.
 
 ### Ubuntu/Debian
-1. 使用系统包管理器安装SDL2依赖库和GCC
+1. Install SDL2 dependency libraries and GCC using the system package manager
 ```
 sudo apt update && sudo apt install libsdl2-dev libsdl2-image-dev gcc g++
 ```
-2. 使用oneapi安装Intel OIDN降噪器  
-安装必要工具
+2. Install Intel OIDN denoiser using oneAPI  
+Install necessary tools
 ```
 sudo apt update && sudo apt install -y gpg-agent wget
 ```
 
-下载并添加 Intel GPG 公钥，这个密钥用于验证从 Intel 仓库下载的软件包的完整性
+Download and add the Intel GPG public key, which is used to verify the integrity of packages downloaded from the Intel repository
 ```
 wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \ | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
 ```
 
-添加 OneAPI 仓库到 APT 源列表，会创建一个新的文件，告诉系统从哪里获取 OneAPI 软件包
+Add the OneAPI repository to the APT source list, which creates a new file telling the system where to get OneAPI packages
 ```
 echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
 ```
 
-让包管理器获取新的软件包并安装OIDN（安装全部工具：sudo apt install intel-basekit）
+Let the package manager fetch new packages and install OIDN (To install all tools: sudo apt install intel-basekit)
 ```
 sudo apt update && sudo apt install intel-renderkit
 ```
 
-配置运行时动态库查找路径（撤销修改：sudo rm /etc/ld.so.conf.d/oneapi.conf && sudo ldconfig）
+Configure the runtime dynamic library search path (To undo changes: sudo rm /etc/ld.so.conf.d/oneapi.conf && sudo ldconfig)
 ```
 echo "/opt/intel/oneapi/oidn/2.2/lib/" | sudo tee /etc/ld.so.conf.d/oneapi.conf && sudo ldconfig
 ```
 
-然后使用CMake编译，同时传入CMake参数（需要替换为实际的安装路径，由于版本不同安装路径可能不同）
+Then use CMake to compile, passing CMake arguments (needs to be replaced with the actual installation path, as it may vary by version)
 ```
 -DOpenImageDenoise_DIR=/opt/intel/oneapi/oidn/2.2/lib/cmake/OpenImageDenoise/
 ```
 
-3. 设置环境变量（运行时需要）  
-1.使用CLion运行
+3. Set environment variables (required at runtime)  
+1. Running with CLion
 ```
-在右上角项目名 -> 下拉菜单 -> Edit Configuration -> Environment Variables中添加环境变量
-1.在新终端中执行source /opt/intel/oneapi/setvars.sh
-2.echo $LD_LIBRARY_PATH
-3.将输出的字符串完整复制作为环境变量值
-4.保存修改
+Add environment variables in: Top right project name -> Dropdown menu -> Edit Configuration -> Environment Variables
+1. Execute source /opt/intel/oneapi/setvars.sh in a new terminal
+2. echo $LD_LIBRARY_PATH
+3. Copy the entire output string as the environment variable value
+4. Save changes
 ```
 
-2.在终端中运行（新开一个终端），第二条命令无需严格执行，在终端中运行编译好的可执行文件即可
+2. Running in the terminal (open a new terminal); the second command does not need to be strictly followed, just run the compiled executable in.
 ```
 1.source /opt/intel/oneapi/setvars.sh
 2.cd bin && ./RendererTest
